@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-# main
-=======
+
 # SubZero
->>>>>>> main
+
