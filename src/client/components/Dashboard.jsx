@@ -1,5 +1,9 @@
-export default function Dashboard () {
-    return (
-        <div>I am the dash.</div>
-    )
+import SubscriptionSection from './SubscriptionSection';
+
+export default function Dashboard() {
+  return (
+    <div>
+      <SubscriptionSection />
+    </div>
+  );
 }
