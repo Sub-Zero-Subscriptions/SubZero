@@ -75,12 +75,35 @@ authcontroller.signup = async (req, res, next) => {
         //create new user with hashpassword
         const hashedPassword = await hashPassword(password);
         console.log('Hashed Password: ',hashedPassword);
+        const insertValues = [username, hashedPassword];
         const insertQuery = `
             INSERT INTO users (username, hashpassword)
             VALUES ($1, $2)
             RETURNING _id
         `;
+        const newUser = await pool.query(insertQuery, insertValues);
 
+        //error handling if unable to insert new user into DB
+        if(newUser.rowCount === 0) {
+            return next(
+                {
+                    log: 'Failed to insert new user into DB',
+                    status:500,
+                    message: {err: 'Error adding new user'}
+                }
+            )
+        }
+        const userId = newUser.rows[0]._id; //primary key of user table = _id
+
+        //create jwt for user and attached as a cookie
+        const token = createToken(userId);
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: true
+        });
+
+        res.locals.message = 'Successfully add new user!';
+        next();
     }
     catch{
         next({
@@ -89,12 +112,82 @@ authcontroller.signup = async (req, res, next) => {
             message: { err: `Error in signup: ${error}`},
         })
     }
-}
+};
 
-//authcontroller.login = 
+authcontroller.login = async (req, res, next) => {
+    console.log('login controller invoked');
+    try {
+        const { username, password } = req.body;
+        //search for the input username in the DB
+        const queryValue = [username];
+        const queryUser = `
+            SELECT _id, hashedPassword
+            FROM users
+            WHERE username = $1
+        `;
+        const userDetails = await pool.query(queryUser, queryValue);
 
-//authcontroller.isLoggedIn = 
+        //error handling if unable to find existing username in DB
+        if(userDetails.rowCount !== 1) {
+            return next(
+                {
+                    log: `Express error handler caught middleware error in authcontroller.login. Singular username not found`,
+                    status: 500,
+                    message: { err: `Credentials not found. Do you have an account? If not sign up for one.`},
+                }
+            )
+        }
+        const dbPassword = userDetails.rows[0].hashpassword
+        console.log('DB Password: ', dbPassword);
+        console.log('Req.body Password :', password);
+        const result = bcrypt.compare(password, dbPassword)
+        console.log('Bcrypt compare result :', result);
+        if(!result) {
+            return next({
+                log: `Express error handler caught middleware error in authcontroller.login. Password did not match`,
+                status: 500,
+                message: { err: `Username/Password combo is not correct`},               
+            });
+        };
 
+        const userId = userDetails.rows[0]._id
 
+        //create jwt for user and attached as a cookie
+        const token = createToken(userId); // pass in primary key id
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: true
+        })
+
+        // add username to res.locals and invoke next
+        res.locals.user = username;
+        next();
+    }
+    catch {
+        next({
+            log: `Express error handler caught middleware error in authcontroller.signup. Error: ${error}`,
+            status: 500,
+            message: { err: `Username/Password combo is not correct. Please retry.`},
+        })
+    }
+};
+
+//controller for if user if already logged in
+authcontroller.isLoggedIn =  async (req, res, next) => {
+    console.log('isLoggedIn controller invoked');
+    try {
+        const { token } = req.cookies;
+        console.log(token);
+        const payload = jwt.verify(token, process.env.JWT_SECRET);
+        next();
+    }
+    catch(error){
+        next({
+            log: `Express error handler caught middleware error in authcontroller.isLoggedIn. Error: ${error}`,
+            status: 500,
+            message: { err: `Error in checking if logged in: ${error}`},
+        })
+    }
+};
 
 module.exports = authcontroller;
