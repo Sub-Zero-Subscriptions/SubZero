@@ -1,6 +1,6 @@
 const { Client } = require('pg');
 
-const PG_URI = 'postgres://';
+const PG_URI = 'postgres://yysmplmk:55twtSJzsQp2o_0wW3aHRHxBl1QQPELU@bubble.db.elephantsql.com/yysmplmk';
 
 // create a new client here using the connection string above
 const client = new Client({
