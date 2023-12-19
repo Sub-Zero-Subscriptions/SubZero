@@ -7,7 +7,7 @@ userRouter.post(
   '/login',
   subscriptionController.retrieveAllSubs,
   (req, res, next) => {
-    return res.status(200).send('You are logged in!');
+    return res.status(200).json(res.locals.allSubs);
   }
 );
 
