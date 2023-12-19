@@ -11,7 +11,7 @@ const SubscriptionChart = () => {
       datasets: [
         {
           data: [10, 5, 8, 12], // Dummy subscription costs
-          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50'],
+          backgroundColor: ['#2d00f7', '#8900f2', '#d100d1', '#f20089'],
         },
       ],
     };
