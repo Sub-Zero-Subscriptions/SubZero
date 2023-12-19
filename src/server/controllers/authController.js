@@ -53,10 +53,13 @@ authcontroller.signup = async (req, res, next) => {
                 }
             )
         }
+
         //check if username already exists in DB
         const selectValues = [username];
         const selectQuery = `
-        
+            SELECT 1
+            FROM users
+            WHERE users.username = $1
         `;
         const userDetails = await pool.query(selectQuery, selectValues);
         if(userDetails.rowCount > 0) {
@@ -68,6 +71,16 @@ authcontroller.signup = async (req, res, next) => {
                 }
             )
         }
+        
+        //create new user with hashpassword
+        const hashedPassword = await hashPassword(password);
+        console.log('Hashed Password: ',hashedPassword);
+        const insertQuery = `
+            INSERT INTO users (username, hashpassword)
+            VALUES ($1, $2)
+            RETURNING _id
+        `;
+
     }
     catch{
         next({
