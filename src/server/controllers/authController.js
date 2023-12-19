@@ -10,4 +10,15 @@ const pool = new Pool({
 
 const SALT_WORK_FACTOR = 10;
 
-const authcontroller = {}
+const authcontroller = {};
+
+
+// authcontroller.signup = 
+
+//authcontroller.login = 
+
+//authcontroller.isLoggedIn = 
+
+
+
+module.exports = authcontroller;
