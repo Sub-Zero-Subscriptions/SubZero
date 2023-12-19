@@ -27,7 +27,7 @@ const SubscriptionSection = () => {
 
   // Function to handle adding a new subscription or updating an existing one
   const handleAddSubscription = () => {
-    // Check if an edit operation is in progress
+    // Check if an edit is in progress
     if (editingIndex !== null) {
       // Update existing subscription if editing
       const updatedSubscriptions = [...subscriptions];
