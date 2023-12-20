@@ -1,8 +1,15 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
+// const bcrypt = require('bcrypt');
+// const jwt = require('jsonwebtoken');
+// require('dotenv').config();
 
-const { Pool } = require('pg');
+// const { Pool } = require('pg');
+
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
+
+import { Pool } from 'pg';
 
 const pool = new Pool({
     connectionString: process.env.POSTGRES_URI
@@ -186,4 +193,4 @@ authController.isLoggedIn =  async (req, res, next) => {
     }
 };
 
-module.exports = authController;
+export default authController;

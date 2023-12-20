@@ -17,7 +17,7 @@ userRouter.post(
 // Create Account
 userRouter.post('/signup', 
   authController.signup,
-  userController.signUp,
+  // userController.signUp,
   (req, res, next) => {
   return res.status(200).json('You are signed up!');
 });

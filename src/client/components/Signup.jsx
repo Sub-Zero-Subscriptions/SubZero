@@ -34,10 +34,10 @@ const defaultTheme = createTheme();
 
 export default function SignUp() {
     const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
         email: '',
         password: '',
+        firstname: '',
+        lastname: ''
       });
 
     const navigate = useNavigate();
@@ -98,10 +98,10 @@ export default function SignUp() {
               <Grid item xs={12} sm={6}>
                 <TextField
                   autoComplete="given-name"
-                  name="firstName"
+                  name="firstname"
                   required
                   fullWidth
-                  id="firstName"
+                  id="firstname"
                   label="First Name"
                   autoFocus
                   onChange={handleChange}
@@ -111,9 +111,9 @@ export default function SignUp() {
                 <TextField
                   required
                   fullWidth
-                  id="lastName"
+                  id="lastname"
                   label="Last Name"
-                  name="lastName"
+                  name="lastname"
                   autoComplete="family-name"
                   onChange={handleChange}
                 />
