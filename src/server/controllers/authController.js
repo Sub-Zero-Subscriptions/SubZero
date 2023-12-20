@@ -152,7 +152,7 @@ authController.login = async (req, res, next) => {
         };
 
         const userId = userDetails.rows[0]._id
-        // console.log('userID', userId)
+        console.log('userID', userId)
         //create jwt for user and attached as a cookie
         const token = createToken(userId); // pass in primary key id
         res.cookie('token', token, {
@@ -168,7 +168,7 @@ authController.login = async (req, res, next) => {
         next({
             log: `Express error handler caught middleware error in authController.signup. Error: ${error}`,
             status: 500,
-            message: { err: `email/Password combo is not correct. Please retry.`},
+            message: { err: `Email/Password combo is not correct. Please retry.`},
         })
     }
 };
