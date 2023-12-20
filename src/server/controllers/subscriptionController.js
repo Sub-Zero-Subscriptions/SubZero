@@ -1,30 +1,15 @@
-import crypto from 'crypto';
-
-// Replace with database model
-const subsDatabase = {};
+import db from '../models/model.js';
 
 const subscriptionController = {};
 
-subscriptionController.generateSubId = (req, res, next) => {
-  try {
-    const subId = crypto.randomUUID();
-    res.locals.subId = subId;
-    return next();
-  } catch (error) {
-    return next({
-      log: 'Error at subscriptionController.generateSubId',
-      message: { err: 'Error generating subscription id' },
-    });
-  }
-};
-
 subscriptionController.findSub = async (req, res, next) => {
   try {
-    const { subname } = req.body;
-    if (!subname) throw new Error('A subscription name is required');
-    const subData = `SELECT * FROM subscriptions WHERE subname = ${subname}`;
-    const response = await subsDatabase.query(subData);
-    res.locals.currentSub = response.rows[0];
+    const { subname, user_id } = req.params;
+    if (!subname || !user_id) throw new Error('All fields are required');
+    const subData = `SELECT * FROM subscriptions WHERE subname = $1 and user_id = $2`;
+    const queryParams = [subname, user_id];
+    const response = await db.query(subData, queryParams);
+    res.locals.currentSub = response.rows;
     return next();
   } catch (error) {
     return next({
@@ -37,7 +22,6 @@ subscriptionController.findSub = async (req, res, next) => {
 subscriptionController.addNewSub = async (req, res, next) => {
   try {
     const requiredProperties = [
-      'sub_id',
       'user_id',
       'subname',
       'subbuydate',
@@ -46,7 +30,6 @@ subscriptionController.addNewSub = async (req, res, next) => {
     ];
 
     const newSubscription = req.body;
-    newSubscription.sub_id = res.locals.subId;
 
     for (const prop of requiredProperties) {
       if (
@@ -57,13 +40,20 @@ subscriptionController.addNewSub = async (req, res, next) => {
       }
     }
 
-    const newSubData = `INSERT INTO subscriptions (sub_id, user_id, subname, subbuydate, subenddate, amountcharged) VALUES(${newUser.sub_id}, ${newSub.user_id}, ${newSub.subname}, ${newSub.subbuydate}, ${newSub.subenddate}, ${newSub.amountcharged}) RETURNING *`;
+    const newSubData = `INSERT INTO subscriptions (user_id, subname, subbuydate, subenddate, amountcharged) VALUES($1, $2, $3, $4, $5)`;
 
-    const response = await subsDatabase.query(newSubData);
-    res.locals.newSub = response.rows[0];
+    const queryParams = [
+      newSubscription.user_id,
+      newSubscription.subname,
+      newSubscription.subbuydate,
+      newSubscription.subenddate,
+      newSubscription.amountcharged,
+    ];
 
+    await db.query(newSubData, queryParams);
     return next();
   } catch (error) {
+    console.log(error);
     return next({
       log: 'Error at subscriptionController.addNewSub',
       message: { err: 'Subscription data incomplete' },
@@ -73,17 +63,29 @@ subscriptionController.addNewSub = async (req, res, next) => {
 
 subscriptionController.editSub = async (req, res, next) => {
   try {
-    const originalSub = res.locals.currentSub;
     const updatedSubscription = req.body;
+
+    const originalSubData = `SELECT * FROM subscriptions WHERE sub_id = $1`;
+    const queryParam1 = [updatedSubscription.sub_id];
+    let originalSub = await db.query(originalSubData, queryParam1);
+    originalSub = originalSub.rows[0];
+    console.log(originalSub);
 
     for (let key in updatedSubscription) {
       originalSub[key] = updatedSubscription[key];
     }
 
-    const updatedSubData = `UPDATE subscriptions SET subname = ${originalSub.subname} subbuydate = ${originalSub.subbuydate} subenddate = ${originalSub.subenddate} amountcharged = ${originalSub.amountcharged} WHERE sub_id = ${originalSub.sub_id}`;
+    const updatedSubData = `UPDATE subscriptions SET subname = $1, subbuydate = $2, subenddate = $3, amountcharged = $4 WHERE sub_id = $5`;
 
-    const response = await subsDatabase.query(updatedSubData);
-    res.locals.updatedSub = response.rows[0];
+    const queryParams = [
+      originalSub.subname,
+      originalSub.subbuydate,
+      originalSub.subenddate,
+      originalSub.amountcharged,
+      originalSub.sub_id,
+    ];
+
+    await db.query(updatedSubData, queryParams);
     return next();
   } catch (error) {
     return next({
@@ -97,9 +99,9 @@ subscriptionController.deleteSub = async (req, res, next) => {
   try {
     const { sub_id } = req.body;
     if (!sub_id) throw new Error('A subscription id is required');
-    const subDelete = `DELETE FROM subscriptions WHERE sub_id = ${sub_id}`;
-    const response = await subsDatabase.query(subDelete);
-    res.locals.deletedSub = response.rows[0];
+    const subDelete = `DELETE FROM subscriptions WHERE sub_id = $1`;
+    const queryParams = [sub_id];
+    await db.query(subDelete, queryParams);
     return next();
   } catch (error) {
     return next({
@@ -111,11 +113,12 @@ subscriptionController.deleteSub = async (req, res, next) => {
 
 subscriptionController.retrieveAllSubs = async (req, res, next) => {
   try {
-    const user_id = req.body._id;
+    const { user_id } = req.body;
     if (!user_id) throw new Error('A user id is required');
-    const subData = `SELECT * FROM subscriptions WHERE user_id = ${user_id}`;
-    const response = await subsDatabase.query(subData);
-    res.locals.allSubs = response.rows[0];
+    const subData = `SELECT * FROM subscriptions WHERE user_id = $1`;
+    const queryParams = [user_id];
+    const response = await db.query(subData, queryParams);
+    res.locals.allSubs = response.rows;
     return next();
   } catch (error) {
     return next({
