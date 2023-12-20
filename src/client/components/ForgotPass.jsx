@@ -1,6 +1,4 @@
 import * as React from 'react';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -14,6 +12,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { Alert } from '@mui/material';
 
 function Copyright(props) {
   return (
@@ -32,47 +31,14 @@ function Copyright(props) {
 
 const defaultTheme = createTheme();
 
-export default function SignUp() {
-    const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-      });
-
-    const navigate = useNavigate();
-  
-    const handleChange = (event) => {
-        const { name, value } = event.target;
-        setFormData((prevData) => ({
-          ...prevData,
-          [name]: value,
-        }));
-        console.log(formData);
-      };
-  
-    const handleSubmit = (event) => {
+export default function ForgotPass() {
+  const handleSubmit = (event) => {
     event.preventDefault();
-    
-    console.log('userData', formData);
-    
-
-    fetch('/user/signup', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-    })
-    .then((res) => {
-        console.log('res ', res);
-        navigate('/dashboard');
-    })
-    .catch((err) => {
-        console.log('Account creation error: ', err.message);
-        throw new Error('Account creation error: ', err.message);
-    })
-    
+    const data = new FormData(event.currentTarget);
+    console.log({
+      email: data.get('email'),
+      password: data.get('password'),
+    });
   };
 
   return (
@@ -91,34 +57,15 @@ export default function SignUp() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign up
+            Reset Password
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField
-                  autoComplete="given-name"
-                  name="firstName"
-                  required
-                  fullWidth
-                  id="firstName"
-                  label="First Name"
-                  autoFocus
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="family-name"
-                  onChange={handleChange}
-                />
+              
               </Grid>
               <Grid item xs={12}>
+              <Alert severity="warning">Please enter your recovery email below:</Alert>
                 <TextField
                   required
                   fullWidth
@@ -126,27 +73,9 @@ export default function SignUp() {
                   label="Email Address"
                   name="email"
                   autoComplete="email"
-                  onChange={handleChange}
                 />
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I am ready to never overpay for subscriptions again."
-                />
-              </Grid>
+              
             </Grid>
             <Button
               type="submit"
@@ -154,12 +83,12 @@ export default function SignUp() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign Up
+              Get Recovery Code
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <Link href="/" variant="body2">
-                  Already have an account? Sign in
+                  Login
                 </Link>
               </Grid>
             </Grid>
