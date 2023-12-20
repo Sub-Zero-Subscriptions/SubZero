@@ -55,7 +55,7 @@ export default function SubscriptionForm() {
   return (
     <div>
       {/* Display the title based on whether it's an edit or add operation */}
-      <Typography variant='h5' gutterBottom>
+      <Typography variant='h5' gutterBottom color={'white'}>
         {isEditMode ? 'Edit Subscription' : 'Add Subscription'}
       </Typography>
       <Paper elevation={3} style={{ padding: '20px', marginBottom: '20px' }}>

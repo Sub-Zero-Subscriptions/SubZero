@@ -33,7 +33,7 @@ export default function SubscriptionList() {
   };
   return (
     <div>
-      <Typography variant='h5' gutterBottom>
+      <Typography variant='h5' gutterBottom color={'white'}>
         Subscription List
       </Typography>
       <Paper elevation={3} style={{ padding: '20px', marginBottom: '20px' }}>
