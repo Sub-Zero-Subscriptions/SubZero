@@ -1,8 +1,8 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import 'dotenv/config';
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
-import { Pool } from 'pg';
+const { Pool } = require('pg');
 
 const pool = new Pool({
     connectionString: process.env.POSTGRES_URI

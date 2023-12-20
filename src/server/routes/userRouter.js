@@ -1,6 +1,5 @@
 import express from 'express';
 import subscriptionController from '../controllers/subscriptionController.js';
-import authcontroller from './controllers/authController.js';
 const userRouter = express.Router();
 
 // User Login
