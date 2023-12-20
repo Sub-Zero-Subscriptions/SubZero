@@ -11,7 +11,8 @@ userRouter.post(
   // userController.authUser,
   // subscriptionController.retrieveAllSubs,
   (req, res, next) => {
-    return res.status(200).json(res.locals.allSubs);
+    return res.status(200).json(res.locals.user);
+    // return res.status(200).json(res.locals.allSubs);
   }
 );
 

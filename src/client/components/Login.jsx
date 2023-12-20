@@ -36,6 +36,8 @@ export default function Login() {
       password: '',
     });
 
+    const [error, setError] = useState(null);
+
     const navigate = useNavigate();
 
     const handleChange = (event) => {
@@ -58,16 +60,18 @@ export default function Login() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({...formData})
+        body: JSON.stringify(formData)
     })
     .then((res) => res.json())
     .then((data) => {
       console.log('data ', data);
-      navigate('/dashboard'); // explore params and encoding to pass data OR make get request when data navs 
+      if (data.status === 200) {
+        navigate('/dashboard'); // explore params and encoding to pass data OR make get request when data navs 
+      }
     })
     .catch((err) => {
         console.error('Authentication error:', err.message);
-        throw new Error('Authentication error:', err.message);
+        setError('Authentication error:', err.message);
     })
   };
 
@@ -106,6 +110,11 @@ export default function Login() {
               Sign in
             </Typography>
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+              {error && (
+                <Typography variant="body2" color="error" align="center" sx={{ mb: 2 }}>
+                  {error}
+                </Typography>
+              )}
               <TextField
                 margin="normal"
                 required
