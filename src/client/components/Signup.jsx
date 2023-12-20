@@ -34,10 +34,10 @@ const defaultTheme = createTheme();
 
 export default function SignUp() {
     const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
         email: '',
         password: '',
+        firstname: '',
+        lastname: ''
       });
 
     const navigate = useNavigate();
@@ -48,7 +48,7 @@ export default function SignUp() {
           ...prevData,
           [name]: value,
         }));
-        console.log(formData);
+        // console.log(formData);
       };
   
     const handleSubmit = (event) => {
@@ -64,9 +64,10 @@ export default function SignUp() {
         },
         body: JSON.stringify(formData)
     })
-    .then((res) => {
-        console.log('res ', res);
-        navigate('/dashboard');
+    .then((res) => res.json())
+    .then((data) => {
+      console.log('data ', data);
+      navigate('/dashboard');
     })
     .catch((err) => {
         console.log('Account creation error: ', err.message);
@@ -98,10 +99,10 @@ export default function SignUp() {
               <Grid item xs={12} sm={6}>
                 <TextField
                   autoComplete="given-name"
-                  name="firstName"
+                  name="firstname"
                   required
                   fullWidth
-                  id="firstName"
+                  id="firstname"
                   label="First Name"
                   autoFocus
                   onChange={handleChange}
@@ -111,9 +112,9 @@ export default function SignUp() {
                 <TextField
                   required
                   fullWidth
-                  id="lastName"
+                  id="lastname"
                   label="Last Name"
-                  name="lastName"
+                  name="lastname"
                   autoComplete="family-name"
                   onChange={handleChange}
                 />

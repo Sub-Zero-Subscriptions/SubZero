@@ -1,17 +1,18 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const { Pool } = require('pg');
+import pg from 'pg';
+const { Pool } = pg;
 
 const pool = new Pool({
     connectionString: process.env.POSTGRES_URI
 })
 
-
 const SALT_WORK_FACTOR = 10;
 
-const authcontroller = {};
+const authController = {};
 
 //generates a jwt
 function createToken(_id) {
@@ -35,46 +36,48 @@ function hashPassword(password) {
     })
 }
 //controller for a new user signing up
-authcontroller.signup = async (req, res, next) => {
+authController.signup = async (req, res, next) => {
     console.log('signup controller invoked');
     try {
-        //get username and password from req.body. If either are falsy, invoke global error handler
-        const {username, password} = req.body;
-        if(!username || !password) {
+        //get email and password from req.body. If either are falsy, invoke global error handler
+        console.log(req.body)
+        const {email, password, firstname, lastname} = req.body;
+        if(!email || !password || !firstname || !lastname) {
             return next(
                 {
-                    log: 'Username or password not submitted', 
+                    log: 'Full name, email or password not submitted', 
                     status: 422,
-                    message: { err: 'Username or password not submitted' },
+                    message: { err: 'Incomplete field at Sign up' },
                 }
             )
         }
 
-        //check if username already exists in DB
-        const selectValues = [username];
+        //check if email already exists in DB
+        const selectValues = [email];
         const selectQuery = `
             SELECT 1
             FROM users
-            WHERE users.username = $1
+            WHERE users.email = $1
         `;
         const userDetails = await pool.query(selectQuery, selectValues);
+        // console.log('userDetails',userDetails)
         if(userDetails.rowCount > 0) {
             return next(
                 {
-                    log: 'Username already exists',
+                    log: 'email already exists',
                     status: 409,
-                    message: { err: 'Username already exists' },        
+                    message: { err: 'email already exists, please login' },        
                 }
             )
         }
         
         //create new user with hashpassword
         const hashedPassword = await hashPassword(password);
-        console.log('Hashed Password: ',hashedPassword);
-        const insertValues = [username, hashedPassword];
+        console.log('Hashed Password: ', hashedPassword);
+        const insertValues = [email, hashedPassword, firstname, lastname];
         const insertQuery = `
-            INSERT INTO users (username, hashpassword)
-            VALUES ($1, $2)
+            INSERT INTO users (email, hashpassword, firstname, lastname)
+            VALUES ($1, $2, $3, $4)
             RETURNING _id
         `;
         const newUser = await pool.query(insertQuery, insertValues);
@@ -91,7 +94,7 @@ authcontroller.signup = async (req, res, next) => {
         }
         const userId = newUser.rows[0]._id; //primary key of user table = _id
 
-        //create jwt for user and attached as a cookie
+        //create jwt for user and attach as a cookie
         const token = createToken(userId);
         res.cookie('token', token, {
             httpOnly: true,
@@ -103,31 +106,33 @@ authcontroller.signup = async (req, res, next) => {
     }
     catch(error){
         next({
-            log: `Express error handler caught middleware error in authcontroller.signup. Error: ${error}`,
+            log: `Express error handler caught middleware error in authController.signup. Error: ${error}`,
             status: 500,
             message: { err: `Error in signup: ${error}`},
         })
     }
 };
 
-authcontroller.login = async (req, res, next) => {
+//controller for login with an existing account
+authController.login = async (req, res, next) => {
     console.log('login controller invoked');
     try {
-        const { username, password } = req.body;
-        //search for the input username in the DB
-        const queryValue = [username];
+        const { email, password } = req.body;
+        console.log('req.body :', req.body)
+        //search for the input email in the DB
+        const queryValue = [email];
         const queryUser = `
-            SELECT _id, hashedPassword
+            SELECT _id, hashpassword
             FROM users
-            WHERE username = $1
+            WHERE email = $1
         `;
         const userDetails = await pool.query(queryUser, queryValue);
-
-        //error handling if unable to find existing username in DB
+        // console.log('userDetails', userDetails);
+        //error handling if unable to find existing email in DB
         if(userDetails.rowCount !== 1) {
             return next(
                 {
-                    log: `Express error handler caught middleware error in authcontroller.login. Singular username not found`,
+                    log: `Express error handler caught middleware error in authController.login. Singular email not found`,
                     status: 500,
                     message: { err: `Credentials not found. Do you have an account? If not sign up for one.`},
                 }
@@ -140,14 +145,14 @@ authcontroller.login = async (req, res, next) => {
         console.log('Bcrypt compare result :', result);
         if(!result) {
             return next({
-                log: `Express error handler caught middleware error in authcontroller.login. Password did not match`,
+                log: `Express error handler caught middleware error in authController.login. Password did not match`,
                 status: 500,
-                message: { err: `Username/Password combo is not correct`},               
+                message: { err: `email/Password combo is not correct`},               
             });
         };
 
         const userId = userDetails.rows[0]._id
-
+        // console.log('userID', userId)
         //create jwt for user and attached as a cookie
         const token = createToken(userId); // pass in primary key id
         res.cookie('token', token, {
@@ -155,21 +160,21 @@ authcontroller.login = async (req, res, next) => {
             secure: true
         })
 
-        // add username to res.locals and invoke next
-        res.locals.user = username;
+        // add email to res.locals and invoke next
+        res.locals.user = email;
         next();
     }
     catch(error) {
         next({
-            log: `Express error handler caught middleware error in authcontroller.signup. Error: ${error}`,
+            log: `Express error handler caught middleware error in authController.signup. Error: ${error}`,
             status: 500,
-            message: { err: `Username/Password combo is not correct. Please retry.`},
+            message: { err: `email/Password combo is not correct. Please retry.`},
         })
     }
 };
 
 //controller for if user if already logged in
-authcontroller.isLoggedIn =  async (req, res, next) => {
+authController.isLoggedIn =  async (req, res, next) => {
     console.log('isLoggedIn controller invoked');
     try {
         const { token } = req.cookies;
@@ -179,11 +184,11 @@ authcontroller.isLoggedIn =  async (req, res, next) => {
     }
     catch(error){
         next({
-            log: `Express error handler caught middleware error in authcontroller.isLoggedIn. Error: ${error}`,
+            log: `Express error handler caught middleware error in authController.isLoggedIn. Error: ${error}`,
             status: 500,
             message: { err: `Error in checking if logged in: ${error}`},
         })
     }
 };
 
-module.exports = authcontroller;
+export default authController;
