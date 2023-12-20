@@ -32,41 +32,38 @@ const defaultTheme = createTheme();
 
 export default function Login() {
     const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-      });
+      email: '',
+      password: '',
+    });
 
     const navigate = useNavigate();
-    
+
     const handleChange = (event) => {
-        const { name, value } = event.target;
-        setFormData((prevData) => ({
-          ...prevData,
-          [name]: value,
-        }));
-      };
-    
+      const { name, value } = event.target;
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    };
+      
     const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const userData = {
-      email: data.get('email'),
-      password: data.get('password'),
-    };
+    // const data = new FormData(event.currentTarget);
 
-    console.log('userData ', userData)
-    navigate('/dashboard');
+    console.log('userData ', formData)
+    // navigate('/dashboard');
     
-    fetch('/login', {
-        method: 'post',
+    fetch('/user/login', {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(userData)
+        body: JSON.stringify({...formData})
     })
     .then((res) => res.json())
     .then((data) => {
-        navigate('/dashboard'); // explore params and encoding to pass data OR make get request when data navs 
+      console.log('data ', data);
+      navigate('/dashboard'); // explore params and encoding to pass data OR make get request when data navs 
     })
     .catch((err) => {
         console.error('Authentication error:', err.message);
@@ -129,6 +126,7 @@ export default function Login() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                onChange={handleChange}
                 
               />
               <FormControlLabel

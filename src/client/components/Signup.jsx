@@ -53,24 +53,19 @@ export default function SignUp() {
   
     const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const userData = {
-        firstName: data.get('firstName'),
-        lastName: data.get('lastName'),
-        email: data.get('email'),
-        password: data.get('password'),
-    }
-    console.log('userData', userData);
-    navigate('/dashboard');
+    
+    console.log('userData', formData);
+    
 
-    fetch('/signup', {
-        method: 'post',
-        header: {
+    fetch('/user/signup', {
+        method: 'POST',
+        headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(userData)
+        body: JSON.stringify(formData)
     })
     .then((res) => {
+        console.log('res ', res);
         navigate('/dashboard');
     })
     .catch((err) => {
