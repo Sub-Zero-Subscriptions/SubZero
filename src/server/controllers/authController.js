@@ -39,13 +39,13 @@ authcontroller.signup = async (req, res, next) => {
     console.log('signup controller invoked');
     try {
         //get username and password from req.body. If either are falsy, invoke global error handler
-        const {username, password} = req.body;
-        if(!username || !password) {
+        const {username, password, firstname, lastname} = req.body;
+        if(!username || !password || !firstname || !lastname) {
             return next(
                 {
-                    log: 'Username or password not submitted', 
+                    log: 'Name, username or password not submitted', 
                     status: 422,
-                    message: { err: 'Username or password not submitted' },
+                    message: { err: 'Incomplete field at Sign up' },
                 }
             )
         }
