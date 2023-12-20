@@ -1,20 +1,14 @@
-// const bcrypt = require('bcrypt');
-// const jwt = require('jsonwebtoken');
-// require('dotenv').config();
-
-// const { Pool } = require('pg');
-
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { Pool } from 'pg';
+import pg from 'pg';
+const { Pool } = pg;
 
 const pool = new Pool({
     connectionString: process.env.POSTGRES_URI
 })
-
 
 const SALT_WORK_FACTOR = 10;
 
@@ -117,6 +111,7 @@ authController.signup = async (req, res, next) => {
     }
 };
 
+//controller for login with an existing account
 authController.login = async (req, res, next) => {
     console.log('login controller invoked');
     try {
