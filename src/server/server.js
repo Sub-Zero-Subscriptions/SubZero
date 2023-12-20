@@ -1,12 +1,14 @@
 import express from 'express';
 import userRouter from './routes/userRouter.js';
 import subscriptionRouter from './routes/subscriptionRouter.js';
+import cookieParser from 'cookie-parser';
 
 const port = 3000;
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use('/user', userRouter);
 app.use('/subscription', subscriptionRouter);
