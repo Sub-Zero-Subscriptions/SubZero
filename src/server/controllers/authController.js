@@ -7,12 +7,7 @@ const { Pool } = require('pg');
 const pool = new Pool({
     connectionString: process.env.POSTGRES_URI
 })
-// async function test() {
-//     const result = await pool.query('SELECT * FROM subscriptions')
-//     console.log(result.rows);    
-// }
 
-// test();
 
 const SALT_WORK_FACTOR = 10;
 
