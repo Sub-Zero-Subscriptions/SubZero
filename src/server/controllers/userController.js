@@ -1,3 +1,3 @@
-const subscriptionController = {};
+const userController = {};
 
-export default subscriptionController;
+export default userController;
