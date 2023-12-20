@@ -7,16 +7,14 @@ const userRouter = express.Router();
 userRouter.post(
   '/login',
   userController.authUser,
-  // subscriptionController.retrieveAllSubs,
+  subscriptionController.retrieveAllSubs,
   (req, res, next) => {
-    return res.status(200).json({message: 'Logged in!'});
+    return res.status(200).json(res.locals.allSubs);
   }
 );
 
 // Create Account
-userRouter.post('/signup', 
-  userController.signUp,
-  (req, res, next) => {
+userRouter.post('/signup', userController.signUp, (req, res, next) => {
   return res.status(200).json('You are signed up!');
 });
 
