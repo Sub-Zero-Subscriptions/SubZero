@@ -31,9 +31,9 @@ export const subscriptionSlice = createSlice({
       state.isEditMode = false;
     },
     deleteSubscription: (state, action) => {
-      state.subscriptions = state.subscriptions.filter((subscription) => {
-        subscription.sub_id !== action.payload;
-      });
+      state.subscriptions = state.subscriptions.filter(
+        (subscription) => subscription.sub_id !== action.payload
+      );
     },
   },
 });
