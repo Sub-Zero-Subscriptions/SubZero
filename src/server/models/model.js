@@ -1,4 +1,4 @@
-const { Client } = require('pg');
+import { Client } from 'pg';
 
 const PG_URI = 'postgres://yysmplmk:55twtSJzsQp2o_0wW3aHRHxBl1QQPELU@bubble.db.elephantsql.com/yysmplmk';
 
@@ -9,10 +9,14 @@ const client = new Client({
 
 client.connect();
 
-
-module.exports = {
-  query: (text, params, callback) => {
-    console.log('executed query', text);
-    return client.query(text, params, callback);
-  }
+export const query = (text, params, callback) => {
+  console.log('executed query', text);
+  return client.query(text, params, callback);
 };
+
+// module.exports = {
+//   query: (text, params, callback) => {
+//     console.log('executed query', text);
+//     return client.query(text, params, callback);
+//   }
+// };
