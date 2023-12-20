@@ -40,6 +40,7 @@ authController.signup = async (req, res, next) => {
     console.log('signup controller invoked');
     try {
         //get email and password from req.body. If either are falsy, invoke global error handler
+        console.log(req.body)
         const {email, password, firstname, lastname} = req.body;
         if(!email || !password || !firstname || !lastname) {
             return next(
@@ -59,6 +60,7 @@ authController.signup = async (req, res, next) => {
             WHERE users.email = $1
         `;
         const userDetails = await pool.query(selectQuery, selectValues);
+        // console.log('userDetails',userDetails)
         if(userDetails.rowCount > 0) {
             return next(
                 {
@@ -116,15 +118,16 @@ authController.login = async (req, res, next) => {
     console.log('login controller invoked');
     try {
         const { email, password } = req.body;
+        console.log('req.body :', req.body)
         //search for the input email in the DB
         const queryValue = [email];
         const queryUser = `
-            SELECT _id, hashedPassword
+            SELECT _id, hashpassword
             FROM users
             WHERE email = $1
         `;
         const userDetails = await pool.query(queryUser, queryValue);
-
+        // console.log('userDetails', userDetails);
         //error handling if unable to find existing email in DB
         if(userDetails.rowCount !== 1) {
             return next(
@@ -149,7 +152,7 @@ authController.login = async (req, res, next) => {
         };
 
         const userId = userDetails.rows[0]._id
-
+        // console.log('userID', userId)
         //create jwt for user and attached as a cookie
         const token = createToken(userId); // pass in primary key id
         res.cookie('token', token, {

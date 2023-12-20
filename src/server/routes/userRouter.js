@@ -7,7 +7,8 @@ const userRouter = express.Router();
 // User Login
 userRouter.post(
   '/login',
-  userController.authUser,
+  authController.login,
+  // userController.authUser,
   // subscriptionController.retrieveAllSubs,
   (req, res, next) => {
     return res.status(200).json({message: 'Logged in!'});

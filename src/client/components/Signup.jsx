@@ -48,7 +48,7 @@ export default function SignUp() {
           ...prevData,
           [name]: value,
         }));
-        console.log(formData);
+        // console.log(formData);
       };
   
     const handleSubmit = (event) => {
@@ -64,9 +64,10 @@ export default function SignUp() {
         },
         body: JSON.stringify(formData)
     })
-    .then((res) => {
-        console.log('res ', res);
-        navigate('/dashboard');
+    .then((res) => res.json())
+    .then((data) => {
+      console.log('data ', data);
+      navigate('/dashboard');
     })
     .catch((err) => {
         console.log('Account creation error: ', err.message);
