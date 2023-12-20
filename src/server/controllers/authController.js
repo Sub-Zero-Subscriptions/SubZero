@@ -19,8 +19,8 @@ const SALT_WORK_FACTOR = 10;
 const authcontroller = {};
 
 //generates a jwt
-function createToken(id) {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRATION});
+function createToken(_id) {
+    return jwt.sign({ _id }, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRATION});
 }
 
 //generates a hashed password
@@ -106,7 +106,7 @@ authcontroller.signup = async (req, res, next) => {
         res.locals.message = 'Successfully add new user!';
         next();
     }
-    catch{
+    catch(error){
         next({
             log: `Express error handler caught middleware error in authcontroller.signup. Error: ${error}`,
             status: 500,
@@ -141,7 +141,7 @@ authcontroller.login = async (req, res, next) => {
         const dbPassword = userDetails.rows[0].hashpassword
         console.log('DB Password: ', dbPassword);
         console.log('Req.body Password :', password);
-        const result = bcrypt.compare(password, dbPassword)
+        const result = await bcrypt.compare(password, dbPassword)
         console.log('Bcrypt compare result :', result);
         if(!result) {
             return next({
@@ -164,7 +164,7 @@ authcontroller.login = async (req, res, next) => {
         res.locals.user = username;
         next();
     }
-    catch {
+    catch(error) {
         next({
             log: `Express error handler caught middleware error in authcontroller.signup. Error: ${error}`,
             status: 500,
