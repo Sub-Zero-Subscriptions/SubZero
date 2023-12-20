@@ -4,10 +4,11 @@ import NavBar from './NavBar';
 import SubscriptionChart from './SubscriptionChart';
 import SubscriptionForm from './SubscriptionForm';
 import SubscriptionList from './SubscriptionList';
+import '../index.css';
 
 export default function Dashboard() {
   return (
-    <div>
+    <div className='background'>
       <NavBar />
       <Grid container style={{ width: '90%', margin: 'auto' }}>
         <Grid item xs={12} lg={4}>
